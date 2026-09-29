@@ -1,9 +1,24 @@
 const fs = require("fs");
 async function uploadImage() {
     try {
-        const imageBuffer = fs.readFileSync("test.jpg");
+        const imageBuffer = fs.readFileSync(filePath);
         const base64Image = imageBuffer.toString("base64");
-        const imageDataUrl = `data:image/jpeg;base64,${base64Image}`;
+         const extension = path.extname(filePath).toLowerCase();
+
+        const mimeTypes = {
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".webp": "image/webp"
+        };
+
+        const mimeType = mimeTypes[extension];
+
+        if (!mimeType) {
+            throw new Error("Unsupported image type");
+        }
+
+        const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
         const response = await fetch("http://localhost:3000/photo", {
             method: "POST",
             headers: {
