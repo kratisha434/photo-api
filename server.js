@@ -1,58 +1,41 @@
+require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const app = express();
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
+const ACCESS_KEY = process.env.ACCESS_KEY;
 app.post("/photo", (req, res) => {
-    const image = req.body.image;
-    if (!image) {
+    const accessKey = req.headers["x-access-key"];
+    if (accessKey !== ACCESS_KEY) {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        });
+    }
+    const base64_img = req.body.base64_img;
+    if (!base64_img) {
         return res.status(400).json({
             success: false,
-            message: "Image is required"
+            message: "Base64 image is required"
         });
     }
     try {
-        let base64Image = image;
-        let extension = "jpg";
-        if (image.startsWith("data:image/")) {
-            const parts = image.split(",");
-
-            const imageInfo = parts[0];
-            base64Image = parts[1];
-
-            if (imageInfo.includes("image/jpeg")) {
-                extension = "jpg";
-            }
-            else if (imageInfo.includes("image/png")) {
-                extension = "png";
-            }
-            else if (imageInfo.includes("image/webp")) {
-                extension = "webp";
-            }
-            else {
-                return res.status(400).json({
-                    success: false,
-                    message: "Unsupported image type"
-                });
-            }
-        }
-        const imageBuffer = Buffer.from(base64Image, "base64");
-        const fileName = `image-${Date.now()}.${extension}`;
-        const filePath = path.join(__dirname, "img", fileName);
+        const imageBuffer = Buffer.from(base64_img, "base64");
+        const filePath = path.join(__dirname,"img",`image-${Date.now()}.jpg`);
         fs.writeFileSync(filePath, imageBuffer);
-        return res.status(200).json({
+        res.json({
             success: true,
-            message: "Image saved successfully",
-            fileName: fileName
+            message: "Image saved successfully"
         });
-
     } catch (error) {
-        return res.status(500).json({
+        console.error(error);
+        res.status(500).json({
             success: false,
             message: "Failed to save image"
         });
     }
 });
 app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+    console.log("Server running on port 3000");
 });
