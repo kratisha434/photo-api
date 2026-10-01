@@ -4,6 +4,22 @@ import path from "path";
 import { validateAccessKey } from "./middleware/auth";
 const app = express();
 app.use(express.json());
+const validateRequest = (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+) => {
+    const allowedMethod = "POST";
+    const allowedPath = "/photo";
+    if (req.method !== allowedMethod || req.path !== allowedPath) {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized access"
+        });
+    }
+    next();
+};
+app.use(validateRequest);
 app.post("/photo", validateAccessKey, (req, res) => {
     const base64_img = req.body.base64_img;
     if (!base64_img) {
