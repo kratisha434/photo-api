@@ -44,12 +44,6 @@ export const logRequest = (
     };
     const logFolder = path.join(__dirname, "..", "..", "log");
     const logFile = path.join(logFolder, "photo_api.log");
-    if (!fs.existsSync(logFolder)) {
-        fs.mkdirSync(logFolder, { recursive: true });
-    }
-    fs.appendFileSync(
-        logFile,
-        JSON.stringify(logData) + "\n"
-    );
+    fs.appendFileSync(logFile, JSON.stringify(logData) + "\n");
     next();
 };
