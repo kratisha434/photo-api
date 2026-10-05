@@ -2,4 +2,4 @@ node_modules/
 img/
 test.jpg
 .env
-log/
+log/photo_api.log
