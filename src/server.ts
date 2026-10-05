@@ -1,7 +1,7 @@
 import "dotenv/config";
-import app from "./app";
 import fs from "fs";
 import path from "path";
+import app from "./app";
 const logFolder = path.join(__dirname, "..", "log");
 const logFile = path.join(logFolder, "photo_api.log");
 if (!fs.existsSync(logFolder)) {
