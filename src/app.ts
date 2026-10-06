@@ -9,6 +9,12 @@ import {
 const app = express();
 app.use(express.json());
 app.use(logRequest);
+app.get("/health", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "OK"
+    });
+});
 app.use(validateRequest);
 app.post("/photo", validateAccessKey, (req, res) => {
     const base64_img = req.body.base64_img;
