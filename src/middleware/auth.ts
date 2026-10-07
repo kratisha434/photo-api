@@ -37,6 +37,7 @@ export const logRequest = (
     next: NextFunction
 ) => {
     const logData = {
+        timestamp: new Date().toISOString(),
         method: req.method,
         payload_size: req.headers["content-length"] || 0,
         ip: req.ip,

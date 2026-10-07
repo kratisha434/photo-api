@@ -7,8 +7,14 @@ import {
     logRequest
 } from "./middleware/auth";
 const app = express();
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 app.use(logRequest);
+app.get("/health", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "OK"
+    });
+});
 app.use(validateRequest);
 app.post("/photo", validateAccessKey, (req, res) => {
     const base64_img = req.body.base64_img;
@@ -21,7 +27,11 @@ app.post("/photo", validateAccessKey, (req, res) => {
     try {
         const imageBuffer = Buffer.from(base64_img, "base64");
         const fileName = `image-${Date.now()}.jpg`;
-        const filePath = path.join(__dirname, "..","img",fileName);
+        const imgFolder = path.join(__dirname, "..", "img");
+        if (!fs.existsSync(imgFolder)) {
+            fs.mkdirSync(imgFolder, { recursive: true });
+        }
+        const filePath = path.join(imgFolder, fileName);
         fs.writeFileSync(filePath, imageBuffer);
         return res.status(200).json({
             success: true,
